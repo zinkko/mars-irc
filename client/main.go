@@ -12,7 +12,11 @@ import (
 )
 
 func main() {
-	url := "ws://localhost:8080"
+	fmt.Print("Which hub would you like to join? ")
+	var hubName string
+	fmt.Scanln(&hubName)
+	hubName = strings.TrimSpace(hubName)
+	url := fmt.Sprintf("ws://localhost:8080?hub=%s", hubName)
 	conn, _, _ := websocket.DefaultDialer.Dial(url, nil)
 
 	defer conn.Close()
