@@ -7,5 +7,3 @@
 - commands, e.g. for delays to other hubs
 
 ## Fixes
-
-- server crashes when client hits Ctrl+C

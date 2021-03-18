@@ -70,10 +70,22 @@ func acceptClient(name string, h *hub, conn *websocket.Conn) {
 
 	go func() {
 		for {
-			_, msg, err := conn.ReadMessage()
+			msgType, msg, err := conn.ReadMessage()
 			if err != nil {
+				h.unregister <- client
+				fmt.Printf("Dropping user '%s' due to error\n", name)
+				break
+			}
+			if msgType == websocket.CloseMessage {
+				fmt.Printf("%s left the server\n", name)
+				h.unregister <- client
+				break
+			}
+			if msgType != websocket.TextMessage {
+				fmt.Println("unsupported message type", msgType)
 				continue
 			}
+
 			for receivingHub, dist := range distances[h] {
 				if dist == 0 {
 					receivingHub.broadcast <- &message{name: name, data: msg}

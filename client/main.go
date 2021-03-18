@@ -44,7 +44,8 @@ func main() {
 	go func() {
 		<-interrupt
 		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-		time.Sleep(time.Second)
+		fmt.Println("forcefully exiting...")
+		time.Sleep(3 * time.Second)
 		os.Exit(1)
 	}()
 
