@@ -5,14 +5,22 @@ import (
 )
 
 type client struct {
-	conn *websocket.Conn
+	name   string
+	origin string
+	conn   *websocket.Conn
+}
+
+type message struct {
+	name   string
+	origin string
+	data   []byte
 }
 
 type hub struct {
 	clients    map[*client]struct{}
 	register   chan *client
 	unregister chan *client
-	broadcast  chan []byte
+	broadcast  chan *message
 }
 
 func (h *hub) start() {
@@ -26,7 +34,9 @@ func (h *hub) start() {
 			}
 		case msg := <-h.broadcast:
 			for client := range h.clients {
-				client.conn.WriteMessage(websocket.TextMessage, msg)
+				if msg.name != client.name {
+					client.conn.WriteMessage(websocket.TextMessage, msg.data)
+				}
 			}
 		}
 	}
@@ -35,7 +45,7 @@ func (h *hub) start() {
 func createHub() *hub {
 	return &hub{
 		clients:    make(map[*client]struct{}),
-		broadcast:  make(chan []byte),
+		broadcast:  make(chan *message),
 		register:   make(chan *client),
 		unregister: make(chan *client),
 	}

@@ -30,7 +30,12 @@ func main() {
 		WriteBufferSize: 1024,
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// name := r.URL.Query().Get("name")
+		name := r.URL.Query().Get("name")
+
+		if name == "" {
+			name = "anon"
+		}
+
 		hub := r.URL.Query().Get("hub")
 
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -40,18 +45,19 @@ func main() {
 
 		if hub == "mars" {
 			fmt.Println("new user joining on Mars")
-			go acceptClient(marsHub, conn)
+			go acceptClient(name, marsHub, conn)
 		} else {
 			fmt.Println("new user joining on Earth")
-			go acceptClient(earthHub, conn)
+			go acceptClient(name, earthHub, conn)
 		}
 	})
 
 	http.ListenAndServe(":8080", nil)
 }
 
-func acceptClient(h *hub, conn *websocket.Conn) {
+func acceptClient(name string, h *hub, conn *websocket.Conn) {
 	client := &client{
+		name: name,
 		conn: conn,
 	}
 
@@ -70,11 +76,11 @@ func acceptClient(h *hub, conn *websocket.Conn) {
 			}
 			for receivingHub, dist := range distances[h] {
 				if dist == 0 {
-					receivingHub.broadcast <- msg
+					receivingHub.broadcast <- &message{name: name, data: msg}
 				} else {
 					go func() {
 						time.Sleep(time.Duration(dist) * time.Second)
-						receivingHub.broadcast <- msg
+						receivingHub.broadcast <- &message{name: name, data: msg}
 					}()
 				}
 			}

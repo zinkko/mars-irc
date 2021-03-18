@@ -11,12 +11,19 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+func prompt(text string) string {
+	var s string
+	fmt.Print(text)
+	fmt.Scanln(&s)
+	return strings.TrimSpace(s)
+}
+
 func main() {
-	fmt.Print("Which hub would you like to join? ")
-	var hubName string
-	fmt.Scanln(&hubName)
+	name := prompt("What is your name? ")
+	hubName := prompt("Which hub would you like to join? ")
+
 	hubName = strings.TrimSpace(hubName)
-	url := fmt.Sprintf("ws://localhost:8080?hub=%s", hubName)
+	url := fmt.Sprintf("ws://localhost:8080?hub=%s&name=%s", hubName, name)
 	conn, _, _ := websocket.DefaultDialer.Dial(url, nil)
 
 	defer conn.Close()
