@@ -9,25 +9,39 @@ import (
 )
 
 var planets = [2]string{"mars", "earth"}
-var distances map[*hub]map[*hub]int
+var distances map[string]map[string]int
+var all_hubs [2]*hub
 
 func main() {
-	marsHub := createHub()
+	marsHub := createHub("mars")
 	go marsHub.start()
-	earthHub := createHub()
+	earthHub := createHub("earth")
 	go earthHub.start()
 
-	distances = make(map[*hub]map[*hub]int)
-	distances[marsHub] = make(map[*hub]int)
-	distances[earthHub] = make(map[*hub]int)
-	distances[marsHub][marsHub] = 0
-	distances[earthHub][earthHub] = 0
-	distances[marsHub][earthHub] = 3
-	distances[earthHub][marsHub] = 3
+	all_hubs = [2]*hub{earthHub, marsHub}
+
+	distances = make(map[string]map[string]int)
+	distances["mars"] = make(map[string]int)
+	distances["earth"] = make(map[string]int)
+	distances["mars"]["mars"] = 0
+	distances["earth"]["earth"] = 0
+	distances["mars"]["earth"] = 3
+	distances["earth"]["mars"] = 3
 
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+			// fmt.Println("Checking requester origin...")
+			// fmt.Printf("%s", r)
+
+			// parts := strings.Split(r.URL.Host, ":")
+			// if len(parts) == 0 {
+			// 	return false
+			// }
+			// return parts[0] == "127.0.0.1"
+		},
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
@@ -40,6 +54,7 @@ func main() {
 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
+			fmt.Printf("%v\n\n", err)
 			panic("ai vittu!")
 		}
 
@@ -86,12 +101,17 @@ func acceptClient(name string, h *hub, conn *websocket.Conn) {
 				continue
 			}
 
-			for receivingHub, dist := range distances[h] {
+			for _, receivingHub := range all_hubs {
+				dist := distances[h.name][receivingHub.name]
+
+				fmt.Printf("client of %s, send to: %v\n", h.name, receivingHub.name)
 				if dist == 0 {
+					fmt.Printf("(%s) broadcast within hub(%s): %s sends: %s\n", h.name, receivingHub.name, name, string(msg))
 					receivingHub.broadcast <- &message{name: name, data: msg}
 				} else {
 					go func() {
 						time.Sleep(time.Duration(dist) * time.Second)
+						fmt.Printf("(%s) broadcast to OTHER hub(%s): %s sends: %s\n", h.name, receivingHub.name, name, string(msg))
 						receivingHub.broadcast <- &message{name: name, data: msg}
 					}()
 				}
