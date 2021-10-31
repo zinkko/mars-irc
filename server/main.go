@@ -83,39 +83,35 @@ func acceptClient(name string, h *hub, conn *websocket.Conn) {
 
 	h.register <- client
 
-	go func() {
-		for {
-			msgType, msg, err := conn.ReadMessage()
-			if err != nil {
-				h.unregister <- client
-				fmt.Printf("Dropping user '%s' due to error\n", name)
-				break
-			}
-			if msgType == websocket.CloseMessage {
-				fmt.Printf("%s left the server\n", name)
-				h.unregister <- client
-				break
-			}
-			if msgType != websocket.TextMessage {
-				fmt.Println("unsupported message type", msgType)
-				continue
-			}
+	for {
+		msgType, msg, err := conn.ReadMessage()
+		if err != nil {
+			h.unregister <- client
+			fmt.Printf("Dropping user '%s' due to error\n", name)
+			break
+		}
+		if msgType == websocket.CloseMessage {
+			fmt.Printf("%s left the server\n", name)
+			h.unregister <- client
+			break
+		}
+		if msgType != websocket.TextMessage {
+			fmt.Println("unsupported message type", msgType)
+			continue
+		}
 
-			for _, receivingHub := range all_hubs {
-				dist := distances[h.name][receivingHub.name]
-
-				fmt.Printf("client of %s, send to: %v\n", h.name, receivingHub.name)
-				if dist == 0 {
-					fmt.Printf("(%s) broadcast within hub(%s): %s sends: %s\n", h.name, receivingHub.name, name, string(msg))
-					receivingHub.broadcast <- &message{name: name, data: msg}
-				} else {
-					go func() {
-						time.Sleep(time.Duration(dist) * time.Second)
-						fmt.Printf("(%s) broadcast to OTHER hub(%s): %s sends: %s\n", h.name, receivingHub.name, name, string(msg))
-						receivingHub.broadcast <- &message{name: name, data: msg}
-					}()
-				}
+		for _, receivingHub := range all_hubs {
+			dist := distances[h.name][receivingHub.name]
+			if dist == 0 {
+				receivingHub.broadcast <- &message{name: name, data: msg}
+			} else {
+				// take new variable, close over that
+				receiver := receivingHub
+				go func() {
+					time.Sleep(time.Duration(dist) * time.Second)
+					receiver.broadcast <- &message{name: name, data: msg}
+				}()
 			}
 		}
-	}()
+	}
 }

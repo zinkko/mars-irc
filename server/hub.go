@@ -36,11 +36,8 @@ func (h *hub) start() {
 				delete(h.clients, client)
 			}
 		case msg := <-h.broadcast:
-			fmt.Printf("broadcast %s on hub(%s)\n", string(msg.data), h.name)
 			for client := range h.clients {
-				fmt.Printf("\tclient: %v\n", client)
 				if msg.name != client.name {
-					fmt.Printf("\t\tSending message thru socket: %s\n", string(msg.data))
 					prefix := fmt.Sprintf("%s: ", msg.name)
 					client.conn.WriteMessage(websocket.TextMessage, append([]byte(prefix), msg.data...))
 				}
