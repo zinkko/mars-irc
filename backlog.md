@@ -3,11 +3,7 @@
 ## Features
 
 - more hubs
-- get available hubs
-- exit command for user
-- show origin hub in messages
-- commands, e.g. for delays to other hubs
+- get available hubs from server
+- show map of hubs on client
 
 ## Fixes
-
-- Fix input prompt getting messed up with incoming messages
