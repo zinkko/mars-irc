@@ -167,6 +167,16 @@
             hub = value;
         }
 
+        function leftpad(n) {
+            if (n >= 10) return "" + n;
+            return "0" + n;
+        }
+
+        function getTimestamp() {
+            const d = new Date();
+            return `${leftpad(d.getHours())}:${leftpad(d.getMinutes())}:${leftpad(d.getSeconds())}`
+        }
+
         function start() {
             /*
             "Login"-modal
@@ -179,8 +189,7 @@
             */
             const socket = new WebSocket(`ws://localhost:8080?name=${name}&hub=${hub}`);
             socket.addEventListener('message', function (event) {
-                console.log("receive message!", event);
-                addMessage(event.data);
+                addMessage(`[rcvd ${getTimestamp()}] ` + event.data);
             });
 
             document.getElementById('username-text').innerHTML = name;
@@ -192,7 +201,7 @@
             */
             document.getElementById('input').onkeydown = (event) => {
                 if (event.keyCode === 13) {
-                    addMessage(name + ": " + event.target.value);
+                    addMessage(`[sent ${getTimestamp()}] ${name}: ${event.target.value}`);
                     socket.send(event.target.value);
                     event.target.value = null;
                 }
