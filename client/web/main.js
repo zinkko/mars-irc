@@ -20,6 +20,12 @@ function getTimestamp() {
     return `${leftpad(d.getHours())}:${leftpad(d.getMinutes())}:${leftpad(d.getSeconds())}`
 }
 
+// setup validation for username input
+const btn = document.getElementById('connect-button');
+document.getElementById('username').oninput = (event) => {
+    btn.disabled = event.target.value === '';
+};
+
 function start() {
     /*
     "Login"-modal

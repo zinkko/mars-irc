@@ -40,6 +40,14 @@ button:hover {
     cursor: pointer;
 }
 
+button:disabled {
+    background: linear-gradient(to right, darkgray, gray);
+}
+
+button:disabled:hover {
+    cursor: not-allowed;
+}
+
 #root {
     display: flow-root;
     height: 100vh;
