@@ -74,6 +74,7 @@
         }
 
         #modal-card {
+            display: grid;
             background-color: white;
             width: 80%;
             height: 60%;
@@ -85,7 +86,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: calc(100% - 92px);
+        }
+
+        #hub-selection {
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+        }
+
+        .radio-container {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 8px;
         }
     </style>
 <head>
@@ -104,16 +120,25 @@
         <div id="modal-card">
             <h4>Enter you username and connect to the hub!</h4>
             <input id="username" type="text" />
+            <div id="hub-selection">
+                <!-- Contents filled in by script -->
+            </div>
             <div id="button-container">
                 <button onclick="start()">Connect!</button>
             </div>
         </div>
     <div>
     <script>
+        let hub = 'earth';
+
         function addMessage(msg) {
             const el = document.createElement('span');
             el.innerText = msg;
             document.getElementById("text-container").appendChild(el);
+        }
+
+        function setHub(value) {
+            hub = value;
         }
 
         function start() {
@@ -126,7 +151,7 @@
             /*
             Websocket Connection
             */
-            const socket = new WebSocket(`ws://localhost:8080?name=${name}&hub=earth`);
+            const socket = new WebSocket(`ws://localhost:8080?name=${name}&hub=${hub}`);
             socket.addEventListener('message', function (event) {
                 console.log("receive message!", event);
                 addMessage(event.data);
@@ -145,6 +170,33 @@
             }
         }
 
+        /*
+        Create hub selection
+        */
+        const hubSelection = document.getElementById('hub-selection');
+        function addHub(name) {
+            const  cont = document.createElement('div');
+            cont.classList.add('radio-container');
+
+            const input = document.createElement('input');
+            input.type = "radio";
+            input.id = name;
+            input.value = name;
+            input.name = "hubs";
+            input.onclick = () => hub = name;
+
+            const label = document.createElement('label');
+            label.htmlFor = name;
+            label.innerHTML = name[0].toUpperCase() + name.replace(/-/g, ' ').slice(1); ;
+
+            cont.appendChild(input);
+            cont.appendChild(label);
+            hubSelection.appendChild(cont);
+        }
+
+        const availableHubs = ['earth', 'mars'];
+        availableHubs.forEach(addHub);
+        document.getElementById('earth').checked = true;
         
     </script>
     </div>
