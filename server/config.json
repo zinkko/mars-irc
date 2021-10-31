@@ -1,0 +1,23 @@
+{
+    "hubs": ["earth", "mars", "jupiter-station"],
+    "distances": {
+        "earth": {
+            "earth": 0,
+            "mars": 3,
+            "jupiter-station": 6
+        },
+        "mars": {
+            "earth": 3,
+            "mars": 0,
+            "jupiter-station": 4
+        },
+        "jupiter-station": {
+            "earth": 6,
+            "mars": 4,
+            "jupiter-station": 0
+        }
+    },
+    "meta": {
+        "unit": "second"
+    }
+}

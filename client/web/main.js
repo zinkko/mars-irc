@@ -81,6 +81,6 @@ function addHub(name) {
     hubSelection.appendChild(cont);
 }
 
-const availableHubs = ['earth', 'mars'];
+const availableHubs = ['earth', 'mars', 'jupiter-station'];
 availableHubs.forEach(addHub);
 document.getElementById('earth').checked = true;
