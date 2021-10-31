@@ -55,7 +55,7 @@ func main() {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			fmt.Printf("%v\n\n", err)
-			panic("ai vittu!")
+			panic("upgrade failed!")
 		}
 
 		if hub == "mars" {
