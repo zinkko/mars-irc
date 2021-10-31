@@ -49,7 +49,7 @@ function start() {
     Input Keyhandler
     */
     document.getElementById('input').onkeydown = (event) => {
-        if (event.keyCode === 13) {
+        if (event.code === 'Enter') {
             addMessage(`[sent ${getTimestamp()}] ${name}: ${event.target.value}`);
             socket.send(event.target.value);
             event.target.value = null;
