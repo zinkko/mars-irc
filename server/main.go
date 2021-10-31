@@ -33,14 +33,6 @@ func main() {
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
 			return true
-			// fmt.Println("Checking requester origin...")
-			// fmt.Printf("%s", r)
-
-			// parts := strings.Split(r.URL.Host, ":")
-			// if len(parts) == 0 {
-			// 	return false
-			// }
-			// return parts[0] == "127.0.0.1"
 		},
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
