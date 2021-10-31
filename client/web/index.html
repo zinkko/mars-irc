@@ -21,6 +21,16 @@
             box-sizing: border-box;
         }
 
+        .brown-gold-terminal {
+            background-color: #8f5b07;
+            color: #e8bd3a;
+        }
+
+        .dark-terminal {
+            background-color: #222;
+            color: ghostwhite;
+        }
+
         button {
             font-family: "Courier Prime", monospace;
             font-size: 1rem;
@@ -51,8 +61,7 @@
             height: calc(100vh - 248px);
             padding: 8px;
 
-            background-color: #222;
-            color: ghostwhite;
+            
             overflow-y: auto;
             overflow-x: hidden;
         }
@@ -103,13 +112,30 @@
         label {
             margin-top: 8px;
         }
+
+        .header-div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #username-text, #current-hub-text {
+            font-weight: bold;
+            color: darkcyan;
+        }
     </style>
 <head>
 <body>
     <div id="root">
-        <h1>Interplanetary Relay Chat Interface</h1>
+        <div class="header-div">
+            <h1>Interplanetary Relay Chat Interface</h1>
+            <div>
+                <p>Logged in as <span id="username-text">[username]</span></p>
+                <p>Connected to <span id="current-hub-text">[hub]</span></p>
+            </div>
+        </div>
         <h3>Incoming messages:</h3>
-        <div id="text-container">
+        <div id="text-container" class="dark-terminal">
+            <!-- Content filled in by script as messages arrive -->
         </div>
         <div id="input-container">
             <h3>Send message:</h3>
@@ -156,6 +182,9 @@
                 console.log("receive message!", event);
                 addMessage(event.data);
             });
+
+            document.getElementById('username-text').innerHTML = name;
+            document.getElementById('current-hub-text').innerHTML = hub;
                 
                 
             /*
