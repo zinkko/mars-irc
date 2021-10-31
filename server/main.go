@@ -10,10 +10,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// var planets = [2]string{"mars", "earth"}
-// var distances map[string]map[string]int
-// var all_hubs [2]*hub
-
 type Configuration struct {
 	Hubs      []string
 	Distances map[string]map[string]int
@@ -21,21 +17,6 @@ type Configuration struct {
 }
 
 func main() {
-	// marsHub := createHub("mars")
-	// go marsHub.start()
-	// earthHub := createHub("earth")
-	// go earthHub.start()
-
-	// all_hubs = [2]*hub{earthHub, marsHub}
-
-	// distances = make(map[string]map[string]int)
-	// distances["mars"] = make(map[string]int)
-	// distances["earth"] = make(map[string]int)
-	// distances["mars"]["mars"] = 0
-	// distances["earth"]["earth"] = 0
-	// distances["mars"]["earth"] = 3
-	// distances["earth"]["mars"] = 3
-
 	file, err := os.Open("server/config.json")
 	if err != nil {
 		panic("Failed to read config file!")
@@ -63,6 +44,18 @@ func main() {
 			return true
 		},
 	}
+	http.HandleFunc("/hubs", func(w http.ResponseWriter, r *http.Request) {
+		data, err := json.Marshal(conf)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Failed to marshal json"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Write(data)
+	})
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
 		hub_name := r.URL.Query().Get("hub")

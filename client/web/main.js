@@ -32,7 +32,7 @@ function start() {
     */
     const name = document.getElementById('username').value;
     document.getElementById('modal').style.display = "none";
-    
+
     /*
     Websocket Connection
     */
@@ -43,8 +43,7 @@ function start() {
 
     document.getElementById('username-text').innerHTML = name;
     document.getElementById('current-hub-text').innerHTML = hub;
-        
-        
+
     /*
     Input Keyhandler
     */
@@ -81,6 +80,9 @@ function addHub(name) {
     hubSelection.appendChild(cont);
 }
 
-const availableHubs = ['earth', 'mars', 'jupiter-station'];
-availableHubs.forEach(addHub);
-document.getElementById('earth').checked = true;
+fetch('http://localhost:8080/hubs').then(response => {
+    response.json().then(data => {
+        data.Hubs.forEach(addHub);
+        document.getElementById(data.Hubs[0]).checked = true;
+    });
+});
