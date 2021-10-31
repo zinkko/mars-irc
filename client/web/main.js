@@ -85,4 +85,7 @@ fetch('http://localhost:8080/hubs').then(response => {
         data.Hubs.forEach(addHub);
         document.getElementById(data.Hubs[0]).checked = true;
     });
+}).catch(error => {
+    const modalCard = document.getElementById('modal-card');
+    modalCard.innerHTML = "Error occured :(<br>" + error;
 });
